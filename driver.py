@@ -9,8 +9,11 @@ if __name__ == '__main__':
     # create ValueIteration object
     the_Object = ValueIteration(width=4, height=5, start_state=(0, 0), end_state=(3, 3), mines_number=3)
 
-    # compute Value Iteration Algorithm
-    # the_Object.compute_algorithm(data)
+    # print(f' Actions: {the_Object.actions}')
+    print(f'Rewards: {the_Object.rewards}')
+    print(f'Landmines: {the_Object.landmines}')
+    print(f'Policy: {the_Object.policy}')
+    print(f'Value Function: {the_Object.V}')
 
-    print(f' Rewards: {the_Object.rewards}')
-    print(f' Landmines: {the_Object.landmines}')
+    # compute Value Iteration Algorithm
+    the_Object.value_iteration()

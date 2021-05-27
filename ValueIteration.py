@@ -39,25 +39,102 @@ class ValueIteration:
                 temp.remove(state)
 
         # Choose random states for landmines
-        self.landmines = random.sample(temp, mines_number)
+        if landmines is None:
+            self.landmines = random.sample(temp, mines_number)
 
         # Define rewards dictionary for all states
         if rewards is None:
             rewards = {}
+
             # setup rewards for all states
             for i in all_states:
+                # setup start state reward
                 if i == start_state:
                     rewards[i] = 0
+                # setup end state reward
                 elif i == end_state:
                     rewards[i] = 100
                 else:
                     rewards[i] = -1
 
-            # setup landmines
+            # setup rewards for landmines
             for i in self.landmines:
                 rewards[i] = -100
 
         self.rewards = rewards
+
+        # Define an initial policy
+        self.policy = {}
+        for s in actions.keys():
+            # select random policy
+            self.policy[s] = np.random.choice(actions[s])
+            
+        # Define initial Value Function
+        self.V = {}
+        
+        for state in all_states:
+            # Set values in all to be 0
+            if state in actions.keys():
+                self.V[state] = 0
+# .....................................................................................................end of Class
+
+    def value_iteration(self):
+        print("Hello Sucker!")
+        iterations = 0
+        gamma = 0.8
+
+        old_Values = self.V
+        new_Values = {}
+
+        # For each state.
+        for state in self.all_states:
+            # store old value
+            old_value = self.V[state]
+            new_value = 0
+
+            # For each Iteration UP , DOWN, LEFT , RIGHT
+            for action in self.actions[state]:
+
+                Values = []
+                next_state = state
+
+                if action == 'UP':
+                    next_state = [state[0]+1, state[1]]
+
+                if action == 'DOWN':
+                    next_state = [state[0]-1, state[1]]
+
+                if action == 'LEFT':
+                    next_state = [state[0], state[1]-1]
+
+                if action == 'RIGHT':
+                    next_state = [state[0], state[1]+1]
+
+                # Calculate the value of the V(state) for up
+                value = self.rewards[state] + (gamma * self.V[next_state])
+
+                # Save value in a list
+                Values.append(value)
+
+            # Find max value of V(s) for the cell.
+            maximum = np.argmax(Values)
+
+            # Save the max value of V(s) for that cell.
+            self.V[state] = maximum
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
                     
