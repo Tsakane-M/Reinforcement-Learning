@@ -7,10 +7,11 @@ from ValueIteration import ValueIteration
 if __name__ == '__main__':
 
     # create ValueIteration object
-    the_Object = ValueIteration(width=4, height=5, start_state=(0, 0), end_state=(3, 3), mines_number=3)
+    the_Object = ValueIteration(width=4, height=5, start_state=(0, 0), end_state=(2, 2), mines_number=3)
 
     # print(f' Actions: {the_Object.actions}')
     print(f'Rewards: {the_Object.rewards}')
+    print(f'All states: {the_Object.all_states}')
     print(f'Landmines: {the_Object.landmines}')
     print(f'Policy: {the_Object.policy}')
     print(f'Value Function: {the_Object.V}')

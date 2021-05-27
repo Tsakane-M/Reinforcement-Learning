@@ -3,8 +3,8 @@ import random
 
 
 class ValueIteration:
-    def __init__(self, width=5, height=4, all_states=None, rewards=None, mines_number=0, start_state=(0, 0),
-                 end_state=(0, 0), actions=None, landmines=None):
+    def __init__(self, width=3, height=2, all_states=None, rewards=None, mines_number=0, start_state=(0, 0),
+                 end_state=(0, 3), actions=None, landmines=None):
         self.width = width
         self.height = height
 
@@ -30,7 +30,8 @@ class ValueIteration:
         # Setup landmines
         self.landmines = []
         # delete start and end states from a our list of states
-        temp = self.all_states
+        temp = self.all_states.copy()
+        
         for state in all_states:
             # remove state if equal to start or end states
             if state == start_state:
@@ -47,7 +48,7 @@ class ValueIteration:
             rewards = {}
 
             # setup rewards for all states
-            for i in all_states:
+            for i in self.all_states:
                 # setup start state reward
                 if i == start_state:
                     rewards[i] = 0
@@ -70,12 +71,12 @@ class ValueIteration:
             self.policy[s] = np.random.choice(actions[s])
             
         # Define initial Value Function
-        self.V = {}
+        V = {}
         
-        for state in all_states:
+        for state in self.all_states:
             # Set values in all to be 0
-            if state in actions.keys():
-                self.V[state] = 0
+            V[state] = 0
+        self.V = V
 # .....................................................................................................end of Class
 
     def value_iteration(self):
@@ -99,22 +100,56 @@ class ValueIteration:
                 next_state = state
 
                 if action == 'UP':
-                    next_state = [state[0]+1, state[1]]
+                    # check if valid state
+                    if (state[0]+1) > (self.height-1):
+                        value = 0
+                    else:
+                        # create next state
+                        next_state = [state[0]+1, state[1]]
+                        # Calculate the value of the V(state) for up using next state
+                        value = self.rewards[state] + (gamma * self.V[tuple(next_state)])
+
+                    # Save value in a list
+                    Values.append(value)
 
                 if action == 'DOWN':
-                    next_state = [state[0]-1, state[1]]
+                    # check if valid state
+                    if (state[0] - 1) < 0:
+                        value = 0
+                    else:
+                        # create next state
+                        next_state = [state[0] - 1, state[1]]
+                        # Calculate the value of the V(state) for up using next state
+                        value = self.rewards[state] + (gamma * self.V[tuple(next_state)])
+
+                    # Save value in a list
+                    Values.append(value)
 
                 if action == 'LEFT':
-                    next_state = [state[0], state[1]-1]
+                    # check if valid state
+                    if (state[1] - 1) < 0:
+                        value = 0
+                    else:
+                        # create next state
+                        next_state = [state[0], state[1]-1]
+                        # Calculate the value of the V(state) for up using next state
+                        value = self.rewards[state] + (gamma * self.V[tuple(next_state)])
+
+                    # Save value in a list
+                    Values.append(value)
 
                 if action == 'RIGHT':
-                    next_state = [state[0], state[1]+1]
+                    # check if valid state
+                    if (state[1] + 1) > (self.width-1):
+                        value = 0
+                    else:
+                        # create next state
+                        next_state = [state[0], state[1]+1]
+                        # Calculate the value of the V(state) for up using next state
+                        value = self.rewards[state] + (gamma * self.V[tuple(next_state)])
 
-                # Calculate the value of the V(state) for up
-                value = self.rewards[state] + (gamma * self.V[next_state])
-
-                # Save value in a list
-                Values.append(value)
+                    # Save value in a list
+                    Values.append(value)
 
             # Find max value of V(s) for the cell.
             maximum = np.argmax(Values)
