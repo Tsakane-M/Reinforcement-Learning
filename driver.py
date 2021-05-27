@@ -1,16 +1,16 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+import numpy as np
+from ValueIteration import ValueIteration
+# This is the driver file.
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    # create ValueIteration object
+    the_Object = ValueIteration(width=4, height=5, start_state=(0, 0), end_state=(3, 3), mines_number=3)
+
+    # compute Value Iteration Algorithm
+    # the_Object.compute_algorithm(data)
+
+    print(f' Rewards: {the_Object.rewards}')
+    print(f' Landmines: {the_Object.landmines}')
