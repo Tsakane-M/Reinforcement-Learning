@@ -7,7 +7,7 @@ from ValueIteration import ValueIteration
 if __name__ == '__main__':
 
     # create ValueIteration object
-    the_Object = ValueIteration(width=4, height=5, start_state=(0, 0), end_state=(2, 2), mines_number=3)
+    the_Object = ValueIteration(width=5, height=5, start_state=(0, 0), end_state=(4, 2), mines_number=2)
 
     # print(f' Actions: {the_Object.actions}')
     print(f'Rewards: {the_Object.rewards}')
@@ -18,3 +18,6 @@ if __name__ == '__main__':
 
     # compute Value Iteration Algorithm
     the_Object.value_iteration()
+
+    #print(f'New Value Function: {the_Object.V}')
+
