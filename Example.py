@@ -9,11 +9,9 @@ import matplotlib.pyplot as plt
 from Animate import generateAnimat
 
 if __name__ == '__main__':
-    # This is just our records data structure, it contains the records of all V(s)
-    # for every state s at a given iteration/epoch in your algorithm
+    # This is just our records data structure, it contains the records of all V(s) for every state s at a given iteration/epoch in your algorithm
     # records[0][1][1] = the Value of grid position (1, 1) at iteration 0
-    # This example assumes that the start state = (0, 0) and the end state = (2, 1)
-    # and that there are no land mines
+    # This example assumes that the start state = (0, 0) and the end state = (2, 1) and that there are no land mines
     records = [
         [
             [0, 0, 0],
@@ -40,8 +38,8 @@ if __name__ == '__main__':
     start_state = (0, 0)
     end_state = (2, 1)
 
-    #mines = []
-    mines = [(1, 1)]  # Uncomment this to check out what mines will look like
+    mines = []
+    # mines = [(1,1)]  # Uncomment this to check out what mines will look like
 
     # We don't need a list of mine positions since our example doesn't have any
     opt_pol = [(0, 0), (1, 0), (2, 0),

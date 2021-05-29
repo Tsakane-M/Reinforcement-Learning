@@ -87,10 +87,10 @@ class ValueIteration:
 # .....................................................................................................end of Class
 
     def value_iteration(self):
-        print("Hello Sucker!")
+
         self.iterations = 1
         gamma = 0.8
-        Theta = 0.005
+        Theta = 1
 
         while True:
             biggest_difference = 0
@@ -99,7 +99,6 @@ class ValueIteration:
                 print(f'state: {state}')
                 # store old value
                 old_value = self.V[state]
-                new_value = 0
                 Values = [-1000 for i in range(4)]
 
                 # For each Iteration UP , DOWN, LEFT , RIGHT
@@ -181,7 +180,7 @@ class ValueIteration:
                 biggest_difference = max(biggest_difference, np.abs(old_value - self.V[state]))
 
             print(f'New Value Function: {self.V}')
-            print(f'Policy: {self.policy}')
+            print(f'Correct Policy: {self.policy}')
 
             if biggest_difference < Theta:
                 print(f'Finished with {self.iterations} iterations.')
@@ -191,16 +190,63 @@ class ValueIteration:
 
         print(f'size of record list is: {len(self.record)}')
         self.create_reshaped_record(self.record)
+        self.create_optimum_policy(self.policy)
 
     def create_reshaped_record(self, record):
         a_record = np.array(record)
         # print(f'a_record: {a_record}')
-        print(f'record: {record}')
+        # print(f'record: {record}')
 
         new = a_record.reshape(self.iterations+1, self.width, self.height)
         list1 = new.tolist()
 
         self.reshaped_record = list1
+
+    def create_optimum_policy(self, policy):
+        opt_policy = []
+        for state in policy:
+            if state == self.start_state:
+                opt_policy.append(state)
+
+                while True:
+                    if policy[state] == 'RIGHT':
+                        direction = (state[0], state[1]+1)
+                        opt_policy.append(direction)
+                        print(direction)
+                        state = direction
+
+                    elif policy[state] == 'LEFT':
+                        direction = (state[0], state[1] - 1)
+                        opt_policy.append(direction)
+                        print(direction)
+                        state = direction
+
+                    elif policy[state] == 'UP':
+                        direction = (state[0]+1, state[1])
+                        opt_policy.append(direction)
+                        print(direction)
+                        state = direction
+
+                    elif policy[state] == 'DOWN':
+                        direction = (state[0] - 1, state[1])
+                        opt_policy.append(direction)
+                        print(direction)
+                        state = direction
+
+                    elif policy[state] == 'STAY':
+                        direction = (state[0], state[1])
+                        # opt_policy.append(direction)
+                        print(direction)
+                        break
+
+        return opt_policy
+
+
+
+
+
+
+
 
 
 
