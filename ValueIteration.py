@@ -11,6 +11,9 @@ class ValueIteration:
         self.start_state = start_state
         self.end_state = end_state
         self.mines_number = mines_number
+        self.record = []
+        self.reshaped_record = []
+        self.iterations = 0
         
         # Define all states
         if all_states is None:
@@ -77,14 +80,17 @@ class ValueIteration:
             # Set values in all to be 0
             V[state] = 0
         self.V = V
+
+        for state in self.all_states:
+            self.record.append(0)
+
 # .....................................................................................................end of Class
 
     def value_iteration(self):
         print("Hello Sucker!")
-        iterations = 0
+        self.iterations = 1
         gamma = 0.8
         Theta = 0.005
-        old_Values = self.V
 
         while True:
             biggest_difference = 0
@@ -165,6 +171,8 @@ class ValueIteration:
 
                 print(f' maximum for state {state} is {maximum}\n')
                 self.V[state] = maximum
+                self.record.append(maximum)
+
                 if state == self.end_state:
                     self.policy[state] = 'STAY'
                 else:
@@ -176,10 +184,23 @@ class ValueIteration:
             print(f'Policy: {self.policy}')
 
             if biggest_difference < Theta:
-                print(f'Finished with {iterations} iterations.')
+                print(f'Finished with {self.iterations} iterations.')
                 break
             else:
-                iterations += 1
+                self.iterations += 1
+
+        print(f'size of record list is: {len(self.record)}')
+        self.create_reshaped_record(self.record)
+
+    def create_reshaped_record(self, record):
+        a_record = np.array(record)
+        # print(f'a_record: {a_record}')
+        print(f'record: {record}')
+
+        new = a_record.reshape(self.iterations+1, self.width, self.height)
+        list1 = new.tolist()
+
+        self.reshaped_record = list1
 
 
 
@@ -192,18 +213,3 @@ class ValueIteration:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-                    
-
-                

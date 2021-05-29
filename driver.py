@@ -7,7 +7,7 @@ from ValueIteration import ValueIteration
 if __name__ == '__main__':
 
     # create ValueIteration object
-    the_Object = ValueIteration(width=5, height=5, start_state=(0, 0), end_state=(4, 2), mines_number=2)
+    the_Object = ValueIteration(width=2, height=2, start_state=(0, 0), end_state=(1, 1), mines_number=1)
 
     # print(f' Actions: {the_Object.actions}')
     print(f'Rewards: {the_Object.rewards}')
@@ -19,5 +19,5 @@ if __name__ == '__main__':
     # compute Value Iteration Algorithm
     the_Object.value_iteration()
 
-    #print(f'New Value Function: {the_Object.V}')
+    print(f'driver file Record: {the_Object.reshaped_record}')
 
