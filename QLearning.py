@@ -4,7 +4,7 @@ import random
 
 class QAgent:
     def __init__(self, width=3, height=2, all_states=None, rewards=None, mines_number=0, start_state=(0, 0),
-                 end_state=(0, 3), actions=None, landmines=None, alpha=0, gamma=0, Q_values=None ):
+                 end_state=(0, 3), actions=None, landmines=None, Q_values=None ):
         self.width = width
         self.height = height
         self.gamma = 0.75
@@ -89,14 +89,34 @@ class QAgent:
     # .....................................................................................................end of Class
 
     def algorithm(self):
-        # Copy the rewards matrix to new Matrix
-
-        # Pick up a state randomly
-        current_state = random.choice(self.all_states)
         print(f'Rewards: {self.rewards}')
-        gamma = self.gamma
+        discount_factor = 0.9
+        epsilon = 0.9
+        learning_rate = 0.9
 
-        print(self.get_random_starting_location())
+        # Pick up a state randomly for episode
+        current_state = self.get_random_starting_location()
+
+        # until we reach terminal state:
+        while not self.is_terminal_state(current_state):
+            next_index = self.get_next_move(current_state, epsilon)
+
+            # perform action
+            # store old state
+            old_state = current_state
+            current_state = self.get_next_location(current_state, next_index)
+            print(f'current_state: {current_state}')
+            # obtain the reward for moving to the new state,
+            reward = self.rewards[current_state]
+            # calculate the temporal difference
+
+
+
+
+
+        # get starting location for episode
+
+
 
     # define a function that determines if the specified location is a terminal state
     def is_terminal_state(self, state):
@@ -128,40 +148,45 @@ class QAgent:
             return np.random.randint(4)
 
     # function that gets next location based on chosen move
-    def get_next_location(self, current_state, a_index):
-        new_state = current_state
-        if self.actions[a_index] == 'UP':
-            if current_state[0] > 0:
-                new_state[0] -= 1
+    def get_next_location(self, this_state, a_index):
+        new_state = this_state
+        if self.actions[a_index] == 'UP' and this_state[0] > 0:
+            direction = (new_state[0]-1, new_state[1])
+            new_state = direction
 
-        elif self.actions[a_index] == 'RIGHT':
-            if current_state[1] < self.width-1:
-                new_state[1] += 1
+        elif self.actions[a_index] == 'RIGHT' and this_state[1] < self.width-1:
+            direction = (new_state[0], new_state[1]+1)
+            new_state = direction
 
-        elif self.actions[a_index] == 'DOWN':
-            if current_state[0] < self.height-1:
-                new_state[0] += 1
+        elif self.actions[a_index] == 'DOWN' and this_state[0] < self.height-1:
+            direction = (new_state[0] + 1, new_state[1])
+            new_state = direction
 
-        elif self.actions[a_index] == 'LEFT':
-            if current_state[1] < self.height - 1:
-                new_state[1] -= 1
+        elif self.actions[a_index] == 'LEFT' and this_state[1] > 0:
+            direction = (new_state[0], new_state[1]-1)
+            new_state = direction
 
         return new_state
 
+    def get_optimum_policy(self, start_state):
+        if start_state == self.end_state:
+            return []
 
+        else:
+            current_state = start_state
+            # append to optimum policy list
+            optimum_policy = [current_state]
+            # append to optimum policy dictionary
+            self.policy[state] = self.actions[self.get_next_move(current_state)]
 
-
-
-
-
-
-
-
-
-
-
-
-
+            while not self.is_terminal_state(current_state):
+                # obtain next move
+                a_index = self.get_next_move(current_state, 1)
+                # move to the next location on the path, and add the new location to policy list
+                current_state = self.get_next_location(current_state, a_index)
+                optimum_policy.append(current_state)
+                self.policy[state] = self.actions[self.get_next_move(current_state)]
+            return optimum_policy
 
 
 # Press the green button in the gutter to run the script.

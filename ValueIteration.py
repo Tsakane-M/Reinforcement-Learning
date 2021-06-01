@@ -218,31 +218,26 @@ class ValueIteration:
                     if policy[state] == 'RIGHT':
                         direction = (state[0], state[1]+1)
                         opt_policy.append(direction)
-                        print(direction)
                         state = direction
 
                     elif policy[state] == 'LEFT':
                         direction = (state[0], state[1] - 1)
                         opt_policy.append(direction)
-                        print(direction)
                         state = direction
 
                     elif policy[state] == 'UP':
                         direction = (state[0]+1, state[1])
                         opt_policy.append(direction)
-                        print(direction)
                         state = direction
 
                     elif policy[state] == 'DOWN':
                         direction = (state[0] - 1, state[1])
                         opt_policy.append(direction)
-                        print(direction)
                         state = direction
 
                     elif policy[state] == 'STAY':
                         direction = (state[0], state[1])
                         # opt_policy.append(direction)
-                        print(direction)
                         break
 
         return opt_policy
