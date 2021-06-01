@@ -127,7 +127,36 @@ class QAgent:
         else:  # return random index
             return np.random.randint(4)
 
-    
+    # function that gets next location based on chosen move
+    def get_next_location(self, current_state, a_index):
+        new_state = current_state
+        if self.actions[a_index] == 'UP':
+            if current_state[0] > 0:
+                new_state[0] -= 1
+
+        elif self.actions[a_index] == 'RIGHT':
+            if current_state[1] < self.width-1:
+                new_state[1] += 1
+
+        elif self.actions[a_index] == 'DOWN':
+            if current_state[0] < self.height-1:
+                new_state[0] += 1
+
+        elif self.actions[a_index] == 'LEFT':
+            if current_state[1] < self.height - 1:
+                new_state[1] -= 1
+
+        return new_state
+
+
+
+
+
+
+
+
+
+
 
 
 
