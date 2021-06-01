@@ -26,7 +26,6 @@ class QAgent:
 
         # Dictionary of possible actions.
         if actions is None:
-            actions = []
             actions = ('DOWN', 'UP', 'LEFT', 'RIGHT')
             self.actions = actions
         print(f'Actions: {self.actions}')
@@ -80,7 +79,7 @@ class QAgent:
 
         for state in self.all_states:
             # Set values in all to be 0
-            Q_values[state] = 0
+            Q_values[state] = [0, 0, 0, 0]
         self.Q_values = Q_values
         print(f'Q values: {self.Q_values}')
 
@@ -118,6 +117,23 @@ class QAgent:
 
         return random_state
 
+    # define a greedy algorithm that will choose which action to take next
+    def get_next_move(self, current_state, epsilon):
+        # ifa  chosen value between 0 and 1 is less than epsilon,
+        # then choose the most promising value from the Q-table for this state.
+        if np.random.random() < epsilon:
+            # return index of max Q value of state
+            return np.argmax(self.Q_values[current_state])
+        else:  # return random index
+            return np.random.randint(4)
+
+    
+
+
+
+
+
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -125,6 +141,12 @@ if __name__ == '__main__':
     # create Q Learning object
     the_Object = QAgent(width=3, height=3, start_state=(0, 0), end_state=(0, 2), mines_number=1)
     the_Object.algorithm()
+
+    # define the shape of the environment (i.e., its states)
+    environment_rows = 11
+    environment_columns = 11
+
+    print(np.zeros((environment_rows, environment_columns, 4)).tolist())
 
 
 
