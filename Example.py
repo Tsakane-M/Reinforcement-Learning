@@ -1,12 +1,9 @@
-# CSC3022F - RL Assignment 2
+# CSC3022F - RL Assignment
 # May 2021
 # This file showcases how you use the generateAnimat function using to
 # generate an animation that visualizes your RL agents learning process.
 
-# Import packages
-import matplotlib.pyplot as plt
-
-from Animate import generateAnimat
+# Impoe import generateAnimat
 
 if __name__ == '__main__':
     # This is just our records data structure, it contains the records of all V(s) for every state s at a given iteration/epoch in your algorithm

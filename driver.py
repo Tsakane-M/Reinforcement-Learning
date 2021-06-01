@@ -1,9 +1,8 @@
 # Import packages
 import numpy as np
-from ValueIteration import ValueIteration
+from ValueIteration import Agent
 
 import matplotlib.pyplot as plt
-
 from Animate import generateAnimat
 # This is the driver file.
 
@@ -12,7 +11,7 @@ from Animate import generateAnimat
 if __name__ == '__main__':
 
     # create ValueIteration object
-    the_Object = ValueIteration(width=4, height=4, start_state=(0, 0), end_state=(3, 2), mines_number=2)
+    the_Object = Agent(width=4, height=7, start_state=(0, 0), end_state=(0, 3), mines_number=1)
 
     # print(f' Actions: {the_Object.actions}')
     print(f'Rewards: {the_Object.rewards}')
@@ -40,3 +39,5 @@ if __name__ == '__main__':
                                    vmin=-10, vmax=150)
 
     plt.show()
+
+
