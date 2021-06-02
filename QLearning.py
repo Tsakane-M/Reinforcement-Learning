@@ -99,9 +99,24 @@ class QAgent:
         epsilon = 0.9
         learning_rate = self.learning_rate
 
-        divider = 50
+        if self.epochs <= 100:
+            divider = 5
+
+        elif 100 < self.epochs <= 500:
+            divider = 10
+
+        elif 500 < self.epochs <= 1000:
+            divider = 100
+
+        elif 1000 < self.epochs <= 5000:
+            divider = 100
+
+        elif self.epochs > 5000:
+            divider = 200
+
         take_a_snap = False
         number_of_snaps = 0
+
         for episode in range(self.epochs):
 
             # Pick up a state randomly for episode
