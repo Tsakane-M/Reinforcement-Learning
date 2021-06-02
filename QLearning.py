@@ -1,10 +1,13 @@
 import numpy as np
 import random
 
+import matplotlib.pyplot as plt
+from Animate import generateAnimat
+
 
 class QAgent:
     def __init__(self, width=3, height=2, all_states=None, rewards=None, mines_number=0, start_state=(0, 0),
-                 end_state=(0, 3), actions=None, landmines=None, Q_values=None):
+                 end_state=(0, 3), actions=None, landmines=None,):
         self.width = width
         self.height = height
         self.gamma = 0.75
@@ -81,13 +84,17 @@ class QAgent:
             Q_values[state] = [0, 0, 0, 0]
         self.Q_values = Q_values
 
+        # Define initial maximum Q-Values dictionary Function
+        self.Max_Q_values = {}
         for state in self.all_states:
-            self.record.append(0)
+            # Set values in all to be 0
+            self.Max_Q_values[state] = 0
+        print(f'initial max Q value dictionary: {self.Max_Q_values}')
 
         print(f'Q_Values: {self.Q_values}')
         print(f'Rewards: {self.rewards}')
         print(f'Landmines: {self.landmines}')
-        print(f'Policy: {self.policy}')
+        print(f'Policy Before: {self.policy}')
         print(f'Actions: {self.actions}')
     # .....................................................................................................end of Class
 
@@ -95,43 +102,61 @@ class QAgent:
 
         discount_factor = 0.9
         epsilon = 0.9
-        learning_rate = 0.9
+        learning_rate = 0.89
 
-        # Pick up a state randomly for episode
-        current_state = self.get_random_starting_location()
-
+        divider = 50
+        take_a_snap = False
+        number_of_snaps = 0
         for episode in range(1000):
+
+            # Pick up a state randomly for episode
+            current_state = self.get_random_starting_location()
+
             # until we reach terminal state:
-            while not self.is_terminal_state(current_state):
+            while current_state != self.end_state:
                 move_index = self.get_next_move(current_state, epsilon)
 
                 # perform action
                 # store old state
                 old_state = current_state
                 current_state = self.get_next_location(current_state, move_index)
-                # print(f'current_state: {current_state}')
+                # print(f' current_state: {current_state}')
 
                 # obtain the reward for moving to the new state,
                 reward = self.rewards[current_state]
                 old_Q_value = self.Q_values[old_state][move_index]
 
+                # calculate maximum value of Q values
+                max_of_Q_values = np.max(self.Q_values[current_state])
+                self.Max_Q_values[current_state] = max_of_Q_values
+
                 # calculate the temporal difference
-                temporal_difference = reward + (discount_factor * np.max(self.Q_values[current_state])) - old_Q_value
+                temporal_difference = reward + (discount_factor * max_of_Q_values) - old_Q_value
 
                 # update the Q values for prev Q(s,a) pairs
-                new_Q_value = old_Q_value + (learning_rate * temporal_difference)
+                the_sum = (learning_rate * temporal_difference)
+                new_Q_value = old_Q_value + the_sum
                 self.Q_values[old_state][move_index] = new_Q_value
 
-        print('Training complete')
-        print(f'After Q_values: {self.Q_values}')
+                if episode % divider == 0:
+                    take_a_snap = True
+                else:
+                    take_a_snap = False
 
-    # define a function that determines if the specified location is a terminal state
-    def is_terminal_state(self, state):
-        # if the reward for this location is -1, then it is not a terminal state (i.e., it is a 'white square')
-        if state == self.end_state:
-            return True
-        else:
-            return False
+            if take_a_snap:
+                temp = [[0]*self.width]*self.height
+                for state in self.Max_Q_values:
+                    temp[state[0]][state[1]] = self.Max_Q_values[state]
+
+                self.record.append(temp)
+                number_of_snaps += 1
+
+        print('Training complete')
+        print(f'Number of snaps: {number_of_snaps}')
+        print(f'After Q_values: {self.Q_values}')
+        print(self.get_optimum_policy(self.start_state))
+        print(f'Policy After: {self.opt_policy}')
+        print(f'Records: {self.record}')
 
     # define a function that will choose a random, non-terminal starting location
     def get_random_starting_location(self):
@@ -139,7 +164,7 @@ class QAgent:
         random_state = random.choice(self.all_states)
 
         # repeat if state is the terminal state,until a terminal is defined
-        while self.is_terminal_state(random_state):
+        while random_state == self.end_state:
             random_state = random.choice(self.all_states)
 
         return random_state
@@ -186,7 +211,7 @@ class QAgent:
             # append to optimum policy dictionary
             self.policy[current_state] = self.actions[self.get_next_move(current_state, 1)]
 
-            while not self.is_terminal_state(current_state):
+            while current_state != self.end_state:
                 # obtain next move
                 a_index = self.get_next_move(current_state, 1)
                 # move to the next location on the path, and add the new location to policy list
@@ -201,5 +226,18 @@ class QAgent:
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # create Q Learning object
-    the_Object = QAgent(width=3, height=3, start_state=(0, 0), end_state=(0, 2), mines_number=1)
+    the_Object = QAgent(width=5, height=5, start_state=(0, 0), end_state=(3, 4), mines_number=4)
     the_Object.algorithm()
+
+    start_state = the_Object.start_state
+    end_state = the_Object.end_state
+    mines = the_Object.landmines
+    opt_pol = the_Object.opt_policy
+    records = the_Object.record
+    print(f'driver optimum policy: {the_Object.opt_policy}')
+
+    anim, fig, ax = generateAnimat(records, start_state, end_state, mines=mines, opt_pol=opt_pol,
+                                   start_val=-10, end_val=100, mine_val=150, just_vals=False, generate_gif=False,
+                                   vmin=-10, vmax=150)
+
+    plt.show()
