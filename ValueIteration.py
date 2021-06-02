@@ -112,6 +112,7 @@ class ValueIteration:
                     # set default next state value
                     next_state = state
 
+
                     if action == 'DOWN':
                         # check if valid state
                         if (state[0] - 1) < 0:
@@ -275,7 +276,6 @@ if __name__ == '__main__':
 
         else:
             argument += 1
-
 
     if end_x == 1000000 or end_y == 1000000 or start_x == 1000000 or start_y == 1000000:
         for i in range(1000):

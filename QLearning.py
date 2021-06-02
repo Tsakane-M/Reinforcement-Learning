@@ -1,24 +1,25 @@
 import numpy as np
 import random
-
+import sys
 import matplotlib.pyplot as plt
 from Animate import generateAnimat
 
 
 class QAgent:
     def __init__(self, width=3, height=2, all_states=None, rewards=None, mines_number=0, start_state=(0, 0),
-                 end_state=(0, 3), actions=None, landmines=None,):
+                 end_state=(0, 3), actions=None, landmines=None, learning_rate=0.8, gamma=0.8, epochs=1000):
         self.width = width
         self.height = height
-        self.gamma = 0.75
+        self.gamma = gamma
+        self.epochs = epochs
 
         self.start_state = start_state
         self.end_state = end_state
         self.mines_number = mines_number
         self.record = []
-        self.reshaped_record = []
         self.iterations = 0
         self.opt_policy = []
+        self.learning_rate = learning_rate
 
         # Define all states
         if all_states is None:
@@ -40,9 +41,9 @@ class QAgent:
 
         for state in all_states:
             # remove state if equal to start or end states
-            if state == start_state:
+            if state == self.start_state:
                 temp.remove(state)
-            if state == end_state:
+            if state == self.end_state:
                 temp.remove(state)
 
         # Choose random states for landmines
@@ -56,10 +57,10 @@ class QAgent:
             # setup rewards for all states
             for i in self.all_states:
                 # setup start state reward
-                if i == start_state:
+                if i == self.start_state:
                     rewards[i] = 0
                 # setup end state reward
-                elif i == end_state:
+                elif i == self.end_state:
                     rewards[i] = 1000
                 else:
                     rewards[i] = 0
@@ -89,25 +90,19 @@ class QAgent:
         for state in self.all_states:
             # Set values in all to be 0
             self.Max_Q_values[state] = 0
-        print(f'initial max Q value dictionary: {self.Max_Q_values}')
 
-        print(f'Q_Values: {self.Q_values}')
-        print(f'Rewards: {self.rewards}')
-        print(f'Landmines: {self.landmines}')
-        print(f'Policy Before: {self.policy}')
-        print(f'Actions: {self.actions}')
     # .....................................................................................................end of Class
 
     def algorithm(self):
 
-        discount_factor = 0.9
+        discount_factor = self.gamma
         epsilon = 0.9
-        learning_rate = 0.89
+        learning_rate = self.learning_rate
 
         divider = 50
         take_a_snap = False
         number_of_snaps = 0
-        for episode in range(1000):
+        for episode in range(self.epochs):
 
             # Pick up a state randomly for episode
             current_state = self.get_random_starting_location()
@@ -120,7 +115,6 @@ class QAgent:
                 # store old state
                 old_state = current_state
                 current_state = self.get_next_location(current_state, move_index)
-                # print(f' current_state: {current_state}')
 
                 # obtain the reward for moving to the new state,
                 reward = self.rewards[current_state]
@@ -150,13 +144,7 @@ class QAgent:
 
                 self.record.append(temp)
                 number_of_snaps += 1
-
-        print('Training complete')
-        print(f'Number of snaps: {number_of_snaps}')
-        print(f'After Q_values: {self.Q_values}')
-        print(self.get_optimum_policy(self.start_state))
-        print(f'Policy After: {self.opt_policy}')
-        print(f'Records: {self.record}')
+        self.get_optimum_policy(self.start_state)
 
     # define a function that will choose a random, non-terminal starting location
     def get_random_starting_location(self):
@@ -200,12 +188,12 @@ class QAgent:
 
         return new_state
 
-    def get_optimum_policy(self, start_state):
-        if start_state == self.end_state:
+    def get_optimum_policy(self, start_state_x):
+        if start_state_x == self.end_state:
             return []
 
         else:
-            current_state = start_state
+            current_state = start_state_x
             # append to optimum policy list
             optimum_policy = [current_state]
             # append to optimum policy dictionary
@@ -225,8 +213,85 @@ class QAgent:
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+
+    # used to set grid width
+    widthd = int(sys.argv[1])
+    # used to set grid height
+    heightd = int(sys.argv[2])
+    # used to set start state x value
+    start_x = 1000000
+    # used to set start state y value
+    start_y = 1000000
+    # used to set end state x value
+    end_x = 1000000
+    # used to set end state y value
+    end_y = 1000000
+    # used to set gamma (default = 0.8)
+    gammad = 0.8
+    # used to set gamma (default = 0.9)
+    learning_rated = 0.89
+    # used to set number of landmines (default = 3)
+    k = 3
+    # used to set number of episodes
+    epochsd = 1000
+
+    argument = 3
+
+    while argument < len(sys.argv):
+
+        if sys.argv[argument] == "-start":
+            start_x = int(sys.argv[argument + 1])
+            start_y = int(sys.argv[argument + 2])
+            argument += 2
+
+        elif sys.argv[argument] == "-end":
+            end_x = int(sys.argv[argument + 1])
+            end_y = int(sys.argv[argument + 2])
+            argument += 2
+
+        elif sys.argv[argument] == "-k":
+            k = int(sys.argv[argument + 1])
+            argument += 1
+
+        elif sys.argv[argument] == "-learning":
+            learning_rated = float(sys.argv[argument + 1])
+            argument += 1
+
+        elif sys.argv[argument] == "-epochs":
+            epochsd = float(sys.argv[argument + 1])
+            argument += 1
+
+        elif sys.argv[argument] == "-gamma":
+            gammad = float(sys.argv[argument + 1])
+            argument += 1
+
+        else:
+            argument += 1
+
+    if end_x == 1000000 or end_y == 1000000 or start_x == 1000000 or start_y == 1000000:
+        for i in range(1000):
+            start_x = np.random.randint(widthd)
+            start_y = np.random.randint(heightd)
+
+            end_x = np.random.randint(widthd)
+            end_y = np.random.randint(heightd)
+
+            if start_x == start_y and end_x == end_y:
+                continue
+            else:
+                break
+
+    this_start_state = (start_y, start_x)
+    print(f'random start:"{this_start_state}')
+
+    this_end_state = (end_y, end_x)
+    print(f'random end:"{this_end_state}')
+
     # create Q Learning object
-    the_Object = QAgent(width=5, height=5, start_state=(0, 0), end_state=(3, 4), mines_number=4)
+    the_Object = QAgent(width=widthd, height=heightd, start_state=this_start_state,
+                        end_state=this_end_state, mines_number=k, learning_rate=learning_rated, gamma=gammad,
+                        epochs=epochsd)
+
     the_Object.algorithm()
 
     start_state = the_Object.start_state
@@ -234,7 +299,12 @@ if __name__ == '__main__':
     mines = the_Object.landmines
     opt_pol = the_Object.opt_policy
     records = the_Object.record
-    print(f'driver optimum policy: {the_Object.opt_policy}')
+    print(f'Environment size: {the_Object.height} x {the_Object.width}')
+    print(f'Start State: {the_Object.start_state}')
+    print(f'End State: {the_Object.end_state}')
+    print(f'Landmines: {the_Object.landmines}')
+
+    print(f'Optimum policy: {the_Object.opt_policy}')
 
     anim, fig, ax = generateAnimat(records, start_state, end_state, mines=mines, opt_pol=opt_pol,
                                    start_val=-10, end_val=100, mine_val=150, just_vals=False, generate_gif=False,
