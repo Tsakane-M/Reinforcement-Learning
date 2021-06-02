@@ -4,7 +4,7 @@ import random
 
 class QAgent:
     def __init__(self, width=3, height=2, all_states=None, rewards=None, mines_number=0, start_state=(0, 0),
-                 end_state=(0, 3), actions=None, landmines=None, Q_values=None ):
+                 end_state=(0, 3), actions=None, landmines=None, Q_values=None):
         self.width = width
         self.height = height
         self.gamma = 0.75
@@ -15,6 +15,7 @@ class QAgent:
         self.record = []
         self.reshaped_record = []
         self.iterations = 0
+        self.opt_policy = []
 
         # Define all states
         if all_states is None:
@@ -28,7 +29,6 @@ class QAgent:
         if actions is None:
             actions = ('DOWN', 'UP', 'LEFT', 'RIGHT')
             self.actions = actions
-        print(f'Actions: {self.actions}')
 
         # Setup landmines
         self.landmines = []
@@ -72,7 +72,6 @@ class QAgent:
         for state in self.all_states:
             # select random policy
             self.policy[state] = np.random.choice(self.actions)
-        print(f'Policy: {self.policy}')
 
         # Define initial Q-Value Function
         Q_values = {}
@@ -81,15 +80,19 @@ class QAgent:
             # Set values in all to be 0
             Q_values[state] = [0, 0, 0, 0]
         self.Q_values = Q_values
-        print(f'Q values: {self.Q_values}')
 
         for state in self.all_states:
             self.record.append(0)
 
+        print(f'Q_Values: {self.Q_values}')
+        print(f'Rewards: {self.rewards}')
+        print(f'Landmines: {self.landmines}')
+        print(f'Policy: {self.policy}')
+        print(f'Actions: {self.actions}')
     # .....................................................................................................end of Class
 
     def algorithm(self):
-        print(f'Rewards: {self.rewards}')
+
         discount_factor = 0.9
         epsilon = 0.9
         learning_rate = 0.9
@@ -97,26 +100,30 @@ class QAgent:
         # Pick up a state randomly for episode
         current_state = self.get_random_starting_location()
 
-        # until we reach terminal state:
-        while not self.is_terminal_state(current_state):
-            next_index = self.get_next_move(current_state, epsilon)
+        for episode in range(1000):
+            # until we reach terminal state:
+            while not self.is_terminal_state(current_state):
+                move_index = self.get_next_move(current_state, epsilon)
 
-            # perform action
-            # store old state
-            old_state = current_state
-            current_state = self.get_next_location(current_state, next_index)
-            print(f'current_state: {current_state}')
-            # obtain the reward for moving to the new state,
-            reward = self.rewards[current_state]
-            # calculate the temporal difference
+                # perform action
+                # store old state
+                old_state = current_state
+                current_state = self.get_next_location(current_state, move_index)
+                # print(f'current_state: {current_state}')
 
+                # obtain the reward for moving to the new state,
+                reward = self.rewards[current_state]
+                old_Q_value = self.Q_values[old_state][move_index]
 
+                # calculate the temporal difference
+                temporal_difference = reward + (discount_factor * np.max(self.Q_values[current_state])) - old_Q_value
 
+                # update the Q values for prev Q(s,a) pairs
+                new_Q_value = old_Q_value + (learning_rate * temporal_difference)
+                self.Q_values[old_state][move_index] = new_Q_value
 
-
-        # get starting location for episode
-
-
+        print('Training complete')
+        print(f'After Q_values: {self.Q_values}')
 
     # define a function that determines if the specified location is a terminal state
     def is_terminal_state(self, state):
@@ -151,19 +158,19 @@ class QAgent:
     def get_next_location(self, this_state, a_index):
         new_state = this_state
         if self.actions[a_index] == 'UP' and this_state[0] > 0:
-            direction = (new_state[0]-1, new_state[1])
+            direction = (new_state[0] - 1, new_state[1])
             new_state = direction
 
-        elif self.actions[a_index] == 'RIGHT' and this_state[1] < self.width-1:
-            direction = (new_state[0], new_state[1]+1)
+        elif self.actions[a_index] == 'RIGHT' and this_state[1] < self.width - 1:
+            direction = (new_state[0], new_state[1] + 1)
             new_state = direction
 
-        elif self.actions[a_index] == 'DOWN' and this_state[0] < self.height-1:
+        elif self.actions[a_index] == 'DOWN' and this_state[0] < self.height - 1:
             direction = (new_state[0] + 1, new_state[1])
             new_state = direction
 
         elif self.actions[a_index] == 'LEFT' and this_state[1] > 0:
-            direction = (new_state[0], new_state[1]-1)
+            direction = (new_state[0], new_state[1] - 1)
             new_state = direction
 
         return new_state
@@ -177,7 +184,7 @@ class QAgent:
             # append to optimum policy list
             optimum_policy = [current_state]
             # append to optimum policy dictionary
-            self.policy[state] = self.actions[self.get_next_move(current_state)]
+            self.policy[current_state] = self.actions[self.get_next_move(current_state, 1)]
 
             while not self.is_terminal_state(current_state):
                 # obtain next move
@@ -185,24 +192,14 @@ class QAgent:
                 # move to the next location on the path, and add the new location to policy list
                 current_state = self.get_next_location(current_state, a_index)
                 optimum_policy.append(current_state)
-                self.policy[state] = self.actions[self.get_next_move(current_state)]
+                self.policy[current_state] = self.actions[self.get_next_move(current_state, 1)]
+
+            self.opt_policy = optimum_policy
             return optimum_policy
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-
     # create Q Learning object
     the_Object = QAgent(width=3, height=3, start_state=(0, 0), end_state=(0, 2), mines_number=1)
     the_Object.algorithm()
-
-    # define the shape of the environment (i.e., its states)
-    environment_rows = 11
-    environment_columns = 11
-
-    print(np.zeros((environment_rows, environment_columns, 4)).tolist())
-
-
-
-
-
