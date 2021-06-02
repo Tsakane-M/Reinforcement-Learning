@@ -5,12 +5,12 @@ import random
 
 import matplotlib.pyplot as plt
 from Animate import generateAnimat
-# This is the driver file.
+import sys
 
 
 class ValueIteration:
     def __init__(self, width=3, height=2, all_states=None, rewards=None, mines_number=0, start_state=(0, 0),
-                 end_state=(0, 3), actions=None, landmines=None):
+                 end_state=(0, 3), actions=None, landmines=None, gamma=0.8):
         self.width = width
         self.height = height
 
@@ -20,6 +20,7 @@ class ValueIteration:
         self.record = []
         self.reshaped_record = []
         self.iterations = 0
+        self.gamma = gamma
         
         # Define all states
         if all_states is None:
@@ -95,14 +96,13 @@ class ValueIteration:
     def value_iteration(self):
 
         self.iterations = 1
-        gamma = 0.8
+        gamma = self.gamma
         Theta = 1
 
         while True:
             biggest_difference = 0
             # For each state.
             for state in self.all_states:
-                print(f'state: {state}')
                 # store old value
                 old_value = self.V[state]
                 Values = [-1000 for i in range(4)]
@@ -124,7 +124,6 @@ class ValueIteration:
 
                         # Save value in a list
                         Values[0] = value
-                        print(f' value for action {action} is {value}')
 
                     if action == 'UP':
                         # check if valid state
@@ -138,7 +137,6 @@ class ValueIteration:
 
                         # Save value in a list
                         Values[1] = value
-                        print(f' value for action {action} is {value}')
 
                     if action == 'LEFT':
                         # check if valid state
@@ -152,7 +150,6 @@ class ValueIteration:
 
                         # Save value in a list
                         Values[2] = value
-                        print(f' value for action {action} is {value}')
 
                     if action == 'RIGHT':
                         # check if valid state
@@ -166,15 +163,12 @@ class ValueIteration:
 
                         # Save value in a list
                         Values[3] = value
-                        print(f' value for action {action} is {value}')
 
                 # Find max value of V(s) for the cell.
-                print(f' Values list is {Values}')
                 maximum = np.max(Values)
 
                 # Save the max value of V(s) for that cell.
 
-                print(f' maximum for state {state} is {maximum}\n')
                 self.V[state] = maximum
                 self.record.append(maximum)
 
@@ -185,23 +179,17 @@ class ValueIteration:
 
                 biggest_difference = max(biggest_difference, np.abs(old_value - self.V[state]))
 
-            print(f'New Value Function: {self.V}')
-            print(f'Correct Policy: {self.policy}')
-
             if biggest_difference < Theta:
                 print(f'Finished with {self.iterations} iterations.')
                 break
             else:
                 self.iterations += 1
 
-        print(f'size of record list is: {len(self.record)}')
         self.create_reshaped_record(self.record)
         self.create_optimum_policy(self.policy)
 
     def create_reshaped_record(self, record):
         a_record = np.array(record)
-        # print(f'a_record: {a_record}')
-        # print(f'record: {record}')
 
         new = a_record.reshape(self.iterations+1, self.width, self.height)
         list1 = new.tolist()
@@ -246,29 +234,82 @@ class ValueIteration:
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
+    # used to set grid width
+    width = int(sys.argv[1])
+    # used to set grid height
+    height = int(sys.argv[2])
+    # used to set start state x value
+    start_x = 1000000
+    # used to set start state y value
+    start_y = 1000000
+    # used to set end state x value
+    end_x = 1000000
+    # used to set end state y value
+    end_y = 1000000
+    # used to set gamma (default = 0.8)
+    gamma = 0.8
+    # used to set number of landmines (default = 3)
+    k = 3
+
+    argument = 3
+
+    while argument < len(sys.argv):
+
+        if sys.argv[argument] == "-start":
+            start_x = int(sys.argv[argument+1])
+            start_y = int(sys.argv[argument + 2])
+            argument += 2
+
+        elif sys.argv[argument] == "-end":
+            end_x = int(sys.argv[argument+1])
+            end_y = int(sys.argv[argument + 2])
+            argument += 2
+
+        elif sys.argv[argument] == "-k":
+            k = int(sys.argv[argument+1])
+            argument += 1
+
+        elif sys.argv[argument] == "-gamma":
+            gamma = float(sys.argv[argument+1])
+            argument += 1
+
+        else:
+            argument += 1
+
+
+    if end_x == 1000000 or end_y == 1000000 or start_x == 1000000 or start_y == 1000000:
+        for i in range(1000):
+            start_x = np.random.randint(width)
+            start_y = np.random.randint(height)
+
+            end_x = np.random.randint(width)
+            end_y = np.random.randint(height)
+
+            if start_x == start_y and end_x == end_y:
+                continue
+            else:
+                break
+
+    start_state = (start_y, start_x)
+    end_state = (end_y, end_x)
+
     # create ValueIteration object
-    the_Object = ValueIteration(width=4, height=7, start_state=(0, 0), end_state=(0, 3), mines_number=1)
+    the_Object = ValueIteration(width=width, height=height, start_state=start_state,
+                                end_state=end_state, mines_number=k, gamma=gamma)
 
-    # print(f' Actions: {the_Object.actions}')
-    print(f'Rewards: {the_Object.rewards}')
-    print(f'All states: {the_Object.all_states}')
+    print(f'Environment size: {the_Object.height} x {the_Object.width}')
+    print(f'Start State: {the_Object.start_state}')
+    print(f'End State: {the_Object.end_state}')
     print(f'Landmines: {the_Object.landmines}')
-
-    print(f'Value Function: {the_Object.V}')
 
     # compute Value Iteration Algorithm
     the_Object.value_iteration()
-    print(f'Universal Policy: {the_Object.policy}')
-
-    print(f'Records Array: {the_Object.reshaped_record}')
-
     records = the_Object.reshaped_record
-
     start_state = the_Object.start_state
     end_state = the_Object.end_state
     mines = the_Object.landmines
     opt_pol = the_Object.create_optimum_policy(the_Object.policy)
-    print(f'driver optimum policy: {the_Object.policy}')
+    print(f'Optimum policy: {opt_pol}')
 
     anim, fig, ax = generateAnimat(records, start_state, end_state, mines=mines, opt_pol=opt_pol,
                                    start_val=-10, end_val=100, mine_val=150, just_vals=False, generate_gif=False,
