@@ -1,0 +1,43 @@
+To run:
+ 1) Go into directory from terminal and run "make clean" to make sure directory is clean of all object files.
+ 2) Run "make run_V" command in terminal to compile and run the Value Iteration program
+    with default grid size 4x4 and random end and start states.
+
+    Run "make run_Q" command in terminal to compile and run the Q Learning program
+    with default grid size 4x4 and random end and start states
+
+ 3) Otherwise to run with specific arguments:
+    QLearning.py and should be invoked as follows:
+            python QLearning.py width height [options]
+            where width and height are the dimensions of the environment. The available options are:
+            • -start xpos ypos which specifies the starting location of the agent at the beginning
+            of every epoch.
+            • -end xpos ypos which specifies the target destination of the agent.
+            • -k num which specifies the number of landmines that should be randomly placed
+            within the environment.
+            • -gamma g which specifies the discount factor of the agent.(Should default to a sensible value)
+            • -learning n which specifies the learning rate of the agent.(Should default to a sensible
+            value)
+            • -epochs e which specifies how many episodes your agent should learn for.(Should
+            default to a sensible value)
+
+    ValueIteration.py and should be invoked as follows:
+            python ValueIteration.py width height [options]
+            where width and height are the dimensions of the environment. The available options are:
+            • -start xpos ypos which specifies the starting location of the agent.
+            • -end xpos ypos which specifies the target destination of the agent.
+            • -k num which specifies the number of landmines that should be randomly placed
+            within the environment.
+            • -gamma g which specifies the discount factor of the agent. (Should default to a
+            sensible value)
+
+
+Animate.py: The file that contains the GUI for displaying the output values of the algorithms during iterations.
+
+QLearning.py: This is the main implementation file that contains all the methods used to process the user input data
+           and apply the Q-Learning algorithm  when the program is running.
+
+ValueIteration.py: This is the main implementation file that contains all the methods used to process the user input data
+           and apply the Value Iteration algorithm  when the program is running.
+
+
